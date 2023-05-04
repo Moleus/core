@@ -1,0 +1,13 @@
+{
+  "domain": "georitm",
+  "name": "georitm-client",
+  "codeowners": ["@moleus"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://www.home-assistant.io/integrations/georitm",
+  "homekit": {},
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "ssdp": [],
+  "zeroconf": []
+}

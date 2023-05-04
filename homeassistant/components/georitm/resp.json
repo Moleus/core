@@ -1,0 +1,98 @@
+[
+  {
+    "rev": "K-16.209.020 00421.003",
+    "objectState": {
+      "hasFault": 2,
+      "isOnline": 0,
+      "isGuarded": 1,
+      "hasAlarm": 0
+    },
+    "isFromIDP": true,
+    "devices": [
+      {
+        "deviceType": 1,
+        "name": "Contact GSM-16",
+        "description": "Security control panel \"Contact GSM-16\"",
+        "imei": "864495036226428",
+        "shortName": "K-16",
+        "firmware": "K-16.209.020.003",
+        "apiURLbase": "https://device.ritm.ru",
+        "shellSwf": "https://device.ritm.ru/contact/contact-16/shell/k16.017.137r.swf",
+        "picture": "https://device.ritm.ru/contact/contact-16/picture/K16.png"
+      }
+    ],
+    "name": "Гараж1",
+    "imei": "864495036226428",
+    "isGsmOnline": false,
+    "addressShort": "",
+    "id": 83667,
+    "extId": 22146,
+    "objType": "1",
+    "objStatus": 1
+  },
+  {
+    "rev": "K-14.007.027 00469.003",
+    "objectState": {
+      "hasFault": 0,
+      "isOnline": 0,
+      "isGuarded": 0,
+      "hasAlarm": 0
+    },
+    "isFromIDP": true,
+    "devices": [
+      {
+        "deviceType": 1,
+        "shell": "https://device.ritm.ru/contact/contact-14/shell/c14.001.022/c14.001.022.html",
+        "name": "Contact GSM-14",
+        "description": "Security control panel \"Contact GSM-14\"",
+        "imei": "868728034012739",
+        "shortName": "K-14",
+        "firmware": "K-14.007.027.003",
+        "apiURLbase": "https://device.ritm.ru",
+        "shellSwf": "https://device.ritm.ru/uniupdater/stub.005.008r.swf",
+        "picture": "https://device.ritm.ru/contact/contact-14/picture/K14.png"
+      }
+    ],
+    "name": "Home1",
+    "imei": "868728034012739",
+    "isGsmOnline": false,
+    "addressShort": "",
+    "id": 83444,
+    "extId": 22462,
+    "objType": "1",
+    "objStatus": 1
+  },
+  {
+    "rev": "K-14AW.005.027 00469.003",
+    "objectState": {
+      "hasFault": 0,
+      "isOnline": 1,
+      "isGuarded": 1,
+      "hasAlarm": 1
+    },
+    "isFromIDP": true,
+    "devices": [
+      {
+        "deviceType": 1,
+        "shell": "https://device.ritm.ru/contact/contact-14aw/shell/c14.001.022/c14.001.022.html",
+        "name": "Contact GSM-14A Wi-Fi",
+        "description": "Security control panel \"Contact GSM-14A Wi-Fi\"",
+        "imei": "868728036750179",
+        "shortName": "K-14AW",
+        "firmware": "K-14AW.005.027.003",
+        "apiURLbase": "https://device.ritm.ru",
+        "shellSwf": "https://device.ritm.ru/uniupdater/stub.005.008r.swf",
+        "picture": "https://device.ritm.ru/contact/contact-14aw/picture/14a-8-sb.png"
+      }
+    ],
+    "isGsmOnline": true,
+    "objStatus": 0,
+    "canArm": true,
+    "name": "Деревня",
+    "imei": "868728036750179",
+    "addressShort": "",
+    "id": 97250,
+    "extId": 26181,
+    "objType": "1"
+  }
+]
