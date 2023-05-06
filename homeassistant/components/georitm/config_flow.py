@@ -8,6 +8,7 @@ import aiohttp
 import voluptuous as vol
 
 from homeassistant import config_entries
+from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
@@ -19,9 +20,9 @@ _LOGGER = logging.getLogger(__name__)
 # TODO adjust the data schema to the data that you need
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
-        vol.Required("host"): str,
-        vol.Required("username"): str,
-        vol.Required("password"): str,
+        vol.Required(CONF_HOST): str,
+        vol.Required(CONF_USERNAME): str,
+        vol.Required(CONF_PASSWORD): str,
     }
 )
 
@@ -92,7 +93,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     # InvalidAuth
 
     # Return info that you want to store in the config entry.
-    return {"title": "Name of the device"}
+    return {"title": "GeoRitm Device"}
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):

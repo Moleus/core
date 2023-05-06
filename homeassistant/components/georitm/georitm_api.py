@@ -1,10 +1,11 @@
 import logging
 from typing import Any
+from dacite import from_dict
 
 import aiohttp
 from aiohttp import ClientResponseError
 
-from .const import GeoRitmObjecsTree, GeoRitmObject
+from .model import GeoRitmObjectsTree, GeoRitmObject, ObjArea
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -13,7 +14,6 @@ DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
     "Content-Type": "application/json",
 }
-# GROUP_TYPES = [0, 1]
 GROUP_TYPE = 1
 
 
@@ -29,9 +29,7 @@ class GeoRitmObjectApi:
         self._headers = DEFAULT_HEADERS
         self._devices: list[GeoRitmObject] = []
 
-    async def _post_request(
-        self, session: aiohttp.ClientSession, url, data
-    ) -> dict[str, Any]:
+    async def _post_request(self, session: aiohttp.ClientSession, url, data) -> Any:
         async with session.post(url, headers=self._headers, json=data) as response:
             return await response.json()
 
@@ -57,7 +55,7 @@ class GeoRitmObjectApi:
             return True
         return False
 
-    async def fetch_objects_tree(self) -> GeoRitmObjecsTree:
+    async def fetch_objects_tree(self) -> GeoRitmObjectsTree:
         objects_data = {"sort": "name", "groupType": GROUP_TYPE}
 
         try:
@@ -66,16 +64,57 @@ class GeoRitmObjectApi:
                 f"{CORE_GEO_RITM_BASE_URL}/objects/objects-tree-set/",
                 objects_data,
             )
-            return GeoRitmObjecsTree(**objects_tree_json)
+            _LOGGER.info("Received data: %s", objects_tree_json)
+            object_tree: GeoRitmObjectsTree = from_dict(
+                data_class=GeoRitmObjectsTree, data=objects_tree_json[0]
+            )
+
+            return object_tree
         except ClientResponseError as e:
             if e.status == 401:
                 await self.authenticate()
             raise e
 
-    async def get_device(self, device_id) -> GeoRitmObject | None:
+    async def fetch_full_objects(self, objects_ids: list[int]) -> list[GeoRitmObject]:
         url = f"{CORE_GEO_RITM_BASE_URL}/objects/obj/"
-        data = {"objectId": [device_id]}
+        payload = {"objectId": objects_ids}
 
-        response = await self._post_request(self._session, url, data)
+        objects_json = await self._post_request(self._session, url, payload)
 
-        return GeoRitmObject(**response)
+        objects: GeoRitmObject = []
+        for obj_json in objects_json:
+            if obj_json["objType"] == 1:
+                obj_json["areas"] = await self.get_areas(obj.id)
+            areas += [from_dict(data_class=GeoRitmObject, data=obj_json)]
+
+        return objects
+
+    async def get_areas(self, deviceid):
+        url = f"{CORE_GEO_RITM_BASE_URL}/objects/obj-areas/"
+        payload = {"objectId": deviceid}
+
+        areas_json = await self._post_request(self._session, url, payload)
+
+        areas: ObjArea = []
+        for area_json in areas_json:
+            areas += [from_dict(data_class=ObjArea, data=area_json)]
+
+        return areas
+
+    async def _arm_disarm_object(self, area: int, imei: str, should_arm: bool) -> bool:
+        action = "arm" if should_arm else "disarm"
+        url = f"{CORE_GEO_RITM_BASE_URL}/objects/{action}/"
+        payload = {"imei": imei, "area": int}
+
+        try:
+            return await self._post_request(self._session, url, payload)["success"] == 1
+        except ClientResponseError as e:
+            if e.status == 401:
+                await self.authenticate()
+            raise e
+
+    async def arm_object(self, area: int, imei: str) -> bool:
+        return self._arm_disarm_object(area, imei, True)
+
+    async def disarm_object(self, area: int, imei: str) -> bool:
+        return self._arm_disarm_object(area, imei, False)
