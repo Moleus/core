@@ -1,22 +1,16 @@
+from homeassistant.core import callback
 from homeassistant.components.binary_sensor import (
     DOMAIN as BINARY_DOMAIN,
     BinarySensorDeviceClass,
     BinarySensorEntity,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity import Entity
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.exceptions import ConfigEntryAuthFailed
-from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-    DataUpdateCoordinator,
-    UpdateFailed,
-)
 
 
 from .const import DOMAIN
-from .model import GeoRitmObject, GeoRitmObjectsTree
+from .model import GeoRitmObject
 from .coordinator import GeoRitmUpdateCoordinator
 from .entity import GeoRitmDevice
 
@@ -29,7 +23,7 @@ async def async_setup_entry(
     """Add cover for passed config_entry in HA."""
     coordinator: GeoRitmUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]
 
-    objects: list[GeoRitmObject] = coordinator.data.objs
+    objects: list[GeoRitmObject] = coordinator.data
 
     async_add_entities(
         [GeoRITMGuardSensor(coordinator, obj, idx) for idx, obj in enumerate(objects)]
@@ -40,17 +34,17 @@ class GeoRITMGuardSensor(GeoRitmDevice, BinarySensorEntity):
     """Representation of a GeoRITM guard binary sensor."""
 
     def get_state(self):
-        if self._obj:
-            return not self._obj.objectState.isGuarded
+        if self.obj:
+            return not self.obj.objectState.isGuarded
         return False
 
     @property
     def unique_id(self):
-        return f"{BINARY_DOMAIN}.{DOMAIN}_{self._obj_id}_guard"
+        return f"{BINARY_DOMAIN}.{DOMAIN}_{self.obj.id}_guard"
 
     @property
     def device_class(self):
-        return BinarySensorDeviceClass.SAFETY
+        return BinarySensorDeviceClass.LOCK
 
     @property
     def is_on(self):

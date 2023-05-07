@@ -31,9 +31,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if not await api.authenticate():
         return False
 
-    await coordinator.async_config_entry_first_refresh()
-
     await coordinator.async_init_devices_info()
+    await coordinator.async_config_entry_first_refresh()
 
     # Store the API object for your platforms to access
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator

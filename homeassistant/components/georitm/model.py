@@ -34,7 +34,6 @@ class GeoRitmObjectState:
 @dataclass
 class GeoRitmDevice:
     deviceType: int
-    shell: str
     name: str
     description: str
     imei: str
@@ -52,7 +51,7 @@ class GeoRitmObject:
     addressShort: str
     id: int
     extId: int
-    objType: int
+    objType: int | str
     devices: list[GeoRitmDevice] | None = None
     objStatus: int | None = None
     isGsmOnline: bool | None = None

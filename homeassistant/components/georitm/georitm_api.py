@@ -83,9 +83,9 @@ class GeoRitmObjectApi:
 
         objects: GeoRitmObject = []
         for obj_json in objects_json:
-            if obj_json["objType"] == 1:
-                obj_json["areas"] = await self.get_areas(obj.id)
-            areas += [from_dict(data_class=GeoRitmObject, data=obj_json)]
+            if int(obj_json["objType"]) == 1:
+                obj_json["areas"] = await self.get_areas(obj_json["id"])
+            objects += [from_dict(data_class=GeoRitmObject, data=obj_json)]
 
         return objects
 
@@ -104,17 +104,19 @@ class GeoRitmObjectApi:
     async def _arm_disarm_object(self, area: int, imei: str, should_arm: bool) -> bool:
         action = "arm" if should_arm else "disarm"
         url = f"{CORE_GEO_RITM_BASE_URL}/objects/{action}/"
-        payload = {"imei": imei, "area": int}
+        payload = {"imei": imei, "area": area}
 
         try:
-            return await self._post_request(self._session, url, payload)["success"] == 1
+            result = await self._post_request(self._session, url, payload)
+            _LOGGER.info("%s response is: %s", action, result)
+            return result["success"] == 1
         except ClientResponseError as e:
             if e.status == 401:
                 await self.authenticate()
             raise e
 
     async def arm_object(self, area: int, imei: str) -> bool:
-        return self._arm_disarm_object(area, imei, True)
+        return await self._arm_disarm_object(area, imei, True)
 
     async def disarm_object(self, area: int, imei: str) -> bool:
-        return self._arm_disarm_object(area, imei, False)
+        return await self._arm_disarm_object(area, imei, False)

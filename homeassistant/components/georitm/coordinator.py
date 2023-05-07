@@ -18,7 +18,6 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class GeoRitmUpdateCoordinator(DataUpdateCoordinator[GeoRitmObjectsTree]):
-
     def __init__(self, hass: HomeAssistant, name: str, api: GeoRitmObjectApi) -> None:
         self._objects_info: list[GeoRitmObject]
         self._api = api
@@ -30,19 +29,20 @@ class GeoRitmUpdateCoordinator(DataUpdateCoordinator[GeoRitmObjectsTree]):
         )
 
     async def async_init_devices_info(self):
-        self._objects_info = await self._api.fetch_objects_tree()
+        tree = await self._api.fetch_objects_tree()
+        self._objects_info = tree.objs
 
-    async def _async_update_data(self) -> GeoRitmObjectsTree:
-        async with async_timeout.timeout(4):
+    async def _async_update_data(self) -> list[GeoRitmObject]:
+        async with async_timeout.timeout(8):
             try:
-                objects = []
-                for obj in self._objects_info:
-                await self._api.get_device(obj.id)
+                return await self._api.fetch_full_objects(
+                    list(map(lambda o: o.id, self._objects_info))
+                )
             except ClientResponseError as e:
                 raise UpdateFailed from e
 
     async def async_arm(self, area: int, imei: str):
-        """Set whether Starlink system tied to this coordinator should be stowed."""
+        """Arm object"""
         async with async_timeout.timeout(4):
             try:
                 return await self._api.arm_object(area, imei)
@@ -50,7 +50,7 @@ class GeoRitmUpdateCoordinator(DataUpdateCoordinator[GeoRitmObjectsTree]):
                 raise UpdateFailed from e
 
     async def async_disarm(self, area: int, imei: str):
-        """Set whether Starlink system tied to this coordinator should be stowed."""
+        """Disarm object"""
         async with async_timeout.timeout(4):
             try:
                 return await self._api.disarm_object(area, imei)
